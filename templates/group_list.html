@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Группы{% endblock %}
+{% block title_text %}Учебные группы{% endblock %}
+{% block page_actions %}
+{% if is_methodist or user.is_superuser %}
+<div class="col-auto ms-auto">
+    <a class="btn btn-primary" href="{% url 'group_create' %}">+ Добавить группу</a>
+</div>
+{% endif %}
+{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Список учебных групп</h3>
+        <div class="ms-auto text-secondary">Всего: {{ groups|length }}</div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-vcenter card-table table-hover">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Название</th>
+                <th>Факультет</th>
+                {% if is_methodist or user.is_superuser %}
+                <th class="w-1">Действия</th>
+                {% endif %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for group in groups %}
+            <tr>
+                <td class="text-secondary">#{{ group.id }}</td>
+                <td class="fw-semibold">{{ group.name }}</td>
+                <td><span class="badge bg-purple-lt">{{ group.department.name }}</span></td>
+                {% if is_methodist or user.is_superuser %}
+                <td>
+                    <div class="btn-list flex-nowrap">
+                        <a class="btn btn-sm" href="{% url 'group_update' group.id %}">Изменить</a>
+                        <a class="btn btn-sm btn-outline-danger" href="{% url 'group_delete' group.id %}">Удалить</a>
+                    </div>
+                </td>
+                {% endif %}
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center text-secondary py-5">Групп пока нет.</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}Профиль{% endblock %}
+{% block title_text %}Профиль пользователя{% endblock %}
+{% block content %}
+<div class="row row-cards">
+    <div class="col-12 col-md-6 col-xl-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <span class="avatar avatar-lg bg-primary-lt me-3">{{ user.username|first|upper }}</span>
+                    <div>
+                        <div class="text-secondary">Пользователь</div>
+                        <h3 class="m-0">{{ user.username }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="text-secondary mb-2">Статус доступа</div>
+                <div class="h2 mb-0">
+                    {% if user.is_superuser %}
+                    <span class="badge bg-red-lt">Администратор</span>
+                    {% elif is_methodist %}
+                    <span class="badge bg-green-lt">Методист</span>
+                    {% else %}
+                    <span class="badge bg-blue-lt">Пользователь</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-xl-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="text-secondary mb-2">Быстрый переход</div>
+                <a class="btn btn-primary w-100" href="{% url 'course_list' %}">Открыть список курсов</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Возможности системы</h3>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-12 col-sm-4">
+                        <a class="quick-link" href="{% url 'course_list' %}">
+                            <strong>Курсы</strong>
+                            <span>Просмотр учебных курсов</span>
+                        </a>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <a class="quick-link" href="{% url 'department_list' %}">
+                            <strong>Факультеты</strong>
+                            <span>Структура факультетов</span>
+                        </a>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <a class="quick-link" href="{% url 'group_list' %}">
+                            <strong>Группы</strong>
+                            <span>Список учебных групп</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

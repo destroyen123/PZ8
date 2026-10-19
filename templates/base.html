@@ -1,0 +1,125 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="color-scheme" content="light dark">
+    <title>{% block title %}Учебное приложение{% endblock %} · DjangoApp</title>
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('app-theme') || 'light';
+            document.documentElement.setAttribute('data-bs-theme', savedTheme);
+        })();
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.6.1/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<div class="page">
+    <aside class="navbar navbar-vertical navbar-expand-lg" data-bs-theme="dark">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar-menu"
+                    aria-controls="sidebar-menu" aria-expanded="false" aria-label="Открыть меню">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <h1 class="navbar-brand navbar-brand-autodark">
+                <a href="{% url 'profile' %}" class="text-decoration-none text-white d-flex align-items-center gap-2">
+                    <span class="brand-mark">D</span><span>DjangoApp</span>
+                </a>
+            </h1>
+            {% if user.is_authenticated %}
+            <div class="navbar-nav flex-row d-lg-none">
+                <button class="btn btn-ghost-light btn-icon" type="button" data-theme-toggle title="Сменить тему">◐
+                </button>
+            </div>
+            {% endif %}
+            <div class="collapse navbar-collapse" id="sidebar-menu">
+                <ul class="navbar-nav pt-lg-3">
+                    <li class="nav-item"><a
+                            class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}"
+                            href="{% url 'profile' %}"><span class="nav-link-icon">⌂</span><span class="nav-link-title">Профиль</span></a>
+                    </li>
+                    <li class="nav-item"><a
+                            class="nav-link {% if 'course' in request.resolver_match.url_name %}active{% endif %}"
+                            href="{% url 'course_list' %}"><span class="nav-link-icon">▤</span><span
+                            class="nav-link-title">Курсы</span></a></li>
+                    <li class="nav-item"><a
+                            class="nav-link {% if 'department' in request.resolver_match.url_name %}active{% endif %}"
+                            href="{% url 'department_list' %}"><span class="nav-link-icon">▦</span><span
+                            class="nav-link-title">Факультеты</span></a></li>
+                    <li class="nav-item"><a
+                            class="nav-link {% if 'group' in request.resolver_match.url_name %}active{% endif %}"
+                            href="{% url 'group_list' %}"><span class="nav-link-icon">♟</span><span
+                            class="nav-link-title">Группы</span></a></li>
+                    <li class="nav-item"><a
+                            class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+                            href="{% url 'dashboard' %}"><span class="nav-link-icon">▥</span><span
+                            class="nav-link-title">Дашборды</span></a></li>
+                </ul>
+                {% if user.is_authenticated %}
+                <div class="sidebar-user mt-auto py-3">
+                    <div class="d-flex align-items-center gap-2 px-2">
+                        <span class="avatar avatar-sm bg-primary-lt">{{ user.username|first|upper }}</span>
+                        <div class="flex-fill text-truncate">
+                            <div class="fw-semibold text-white text-truncate">{{ user.username }}</div>
+                            <div class="small text-secondary">{% if user.is_superuser %}Администратор{% elif
+                                is_methodist %}Методист{% else %}Пользователь{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </aside>
+
+    <div class="page-wrapper">
+        <header class="navbar navbar-expand-md d-none d-lg-flex d-print-none topbar">
+            <div class="container-xl justify-content-end gap-2">
+                <button class="btn btn-ghost-secondary btn-icon" type="button" data-theme-toggle
+                        title="Сменить светлую/тёмную тему">◐
+                </button>
+                {% if user.is_authenticated %}
+                <span class="text-secondary me-2">{{ user.username }}</span>
+                <form method="post" action="/accounts/logout/">{% csrf_token %}
+                    <button class="btn btn-outline-secondary btn-sm" type="submit">Выйти</button>
+                </form>
+                {% endif %}
+            </div>
+        </header>
+
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <div class="page-pretitle">Учебное приложение</div>
+                        <h2 class="page-title">{% block page_title %}{% block title_text %}Панель управления{% endblock %}{% endblock %}</h2></div>
+                    {% block page_actions %}{% endblock %}
+                </div>
+            </div>
+        </div>
+
+        <div class="page-body">
+            <div class="container-xl">{% block content %}{% endblock %}</div>
+        </div>
+        <footer class="footer footer-transparent d-print-none">
+            <div class="container-xl">
+                <div class="text-center text-secondary">ПЗ6 · Django + Tabler · дашборды</div>
+            </div>
+        </footer>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.6.1/dist/js/tabler.min.js"></script>
+<script>
+    document.querySelectorAll('[data-theme-toggle]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            const current = document.documentElement.getAttribute('data-bs-theme') || 'light';
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-bs-theme', next);
+            localStorage.setItem('app-theme', next);
+        });
+    });
+</script>
+</body>
+</html>

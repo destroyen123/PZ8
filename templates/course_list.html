@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Курсы{% endblock %}
+{% block title_text %}Список курсов{% endblock %}
+{% block page_actions %}
+{% if is_methodist or user.is_superuser %}
+<div class="col-auto ms-auto">
+    <a class="btn btn-primary" href="{% url 'course_create' %}">+ Добавить курс</a>
+</div>
+{% endif %}
+{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Учебные курсы</h3>
+        <div class="ms-auto text-secondary">Всего: {{ courses|length }}</div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-vcenter card-table table-hover">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Название</th>
+                <th>Факультет</th>
+                <th>Описание</th>
+                {% if is_methodist or user.is_superuser %}
+                <th class="w-1">Действия</th>
+                {% endif %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for course in courses %}
+            <tr>
+                <td class="text-secondary">#{{ course.id }}</td>
+                <td class="fw-semibold">{{ course.title }}</td>
+                <td><span class="badge bg-azure-lt">{{ course.department.name }}</span></td>
+                <td class="text-secondary description-cell">{{ course.description|default:"Нет описания" }}</td>
+                {% if is_methodist or user.is_superuser %}
+                <td>
+                    <div class="btn-list flex-nowrap">
+                        <a class="btn btn-sm" href="{% url 'course_update' course.id %}">Изменить</a>
+                        <a class="btn btn-sm btn-outline-danger" href="{% url 'course_delete' course.id %}">Удалить</a>
+                    </div>
+                </td>
+                {% endif %}
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center text-secondary py-5">Курсов пока нет.</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

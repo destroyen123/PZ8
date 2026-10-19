@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% block title %}Дашборды{% endblock %}
+{% block title_text %}Дашборды{% endblock %}
+
+{% block content %}
+
+<div class="row row-cards mb-4">
+    {% include 'components/stat_card.html' with title='Всего курсов' value=total_courses %}
+    {% include 'components/stat_card.html' with title='Факультетов' value=total_departments %}
+    {% include 'components/stat_card.html' with title='Учебных групп' value=total_groups %}
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <label for="departmentFilter" class="form-label mb-0">
+                    Фильтр по факультету
+                </label>
+            </div>
+            <div class="col">
+                <select id="departmentFilter" class="form-select">
+                    <option value="all">Все факультеты</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row row-cards">
+    {% include 'components/chart_card.html' with title='Курсы по факультетам' chart_id='coursesChart' col_class='col-12 col-xl-6' height='350' %}
+
+    {% include 'components/chart_card.html' with title='Группы по факультетам' chart_id='groupsChart' col_class='col-12 col-xl-6' height='350' %}
+
+    {% include 'components/chart_card.html' with title='Курсы и группы по факультетам' chart_id='comparisonChart' col_class='col-12' height='400' %}
+</div>
+
+{{ department_names|json_script:"department-names" }}
+{{ courses_by_department|json_script:"courses-data" }}
+{{ groups_by_department|json_script:"groups-data" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const departmentNames = JSON.parse(
+        document.getElementById('department-names').textContent
+    );
+
+    const coursesData = JSON.parse(
+        document.getElementById('courses-data').textContent
+    );
+
+    const groupsData = JSON.parse(
+        document.getElementById('groups-data').textContent
+    );
+
+    const coursesChart = new Chart(document.getElementById('coursesChart'), {
+        type: 'bar',
+        data: {
+            labels: departmentNames,
+            datasets: [{
+                label: 'Количество курсов',
+                data: coursesData
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+
+    const groupsChart = new Chart(document.getElementById('groupsChart'), {
+        type: 'doughnut',
+        data: {
+            labels: departmentNames,
+            datasets: [{
+                label: 'Количество групп',
+                data: groupsData
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true
+        }
+    });
+
+    const comparisonChart = new Chart(document.getElementById('comparisonChart'), {
+        type: 'bar',
+        data: {
+            labels: departmentNames,
+            datasets: [
+                {
+                    label: 'Курсы',
+                    data: coursesData
+                },
+                {
+                    label: 'Группы',
+                    data: groupsData
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+
+    const departmentFilter = document.getElementById('departmentFilter');
+
+    departmentNames.forEach((department, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = department;
+        departmentFilter.appendChild(option);
+    });
+
+    departmentFilter.addEventListener('change', function () {
+        const selected = this.value;
+
+        if (selected === 'all') {
+            coursesChart.data.labels = departmentNames;
+            coursesChart.data.datasets[0].data = coursesData;
+
+            groupsChart.data.labels = departmentNames;
+            groupsChart.data.datasets[0].data = groupsData;
+
+            comparisonChart.data.labels = departmentNames;
+            comparisonChart.data.datasets[0].data = coursesData;
+            comparisonChart.data.datasets[1].data = groupsData;
+        } else {
+            const index = Number(selected);
+
+            coursesChart.data.labels = [departmentNames[index]];
+            coursesChart.data.datasets[0].data = [coursesData[index]];
+
+            groupsChart.data.labels = [departmentNames[index]];
+            groupsChart.data.datasets[0].data = [groupsData[index]];
+
+            comparisonChart.data.labels = [departmentNames[index]];
+            comparisonChart.data.datasets[0].data = [coursesData[index]];
+            comparisonChart.data.datasets[1].data = [groupsData[index]];
+        }
+
+        coursesChart.update();
+        groupsChart.update();
+        comparisonChart.update();
+    });
+</script>
+
+{% endblock %}

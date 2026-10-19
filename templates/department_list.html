@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Факультеты{% endblock %}
+{% block title_text %}Факультеты{% endblock %}
+{% block page_actions %}
+{% if is_methodist or user.is_superuser %}
+<div class="col-auto ms-auto">
+    <a class="btn btn-primary" href="{% url 'department_create' %}">+ Добавить факультет</a>
+</div>
+{% endif %}
+{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Список факультетов</h3>
+        <div class="ms-auto text-secondary">Всего: {{ departments|length }}</div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-vcenter card-table table-hover">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Название</th>
+                {% if is_methodist or user.is_superuser %}
+                <th class="w-1">Действия</th>
+                {% endif %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for department in departments %}
+            <tr>
+                <td class="text-secondary">#{{ department.id }}</td>
+                <td class="fw-semibold">{{ department.name }}</td>
+                {% if is_methodist or user.is_superuser %}
+                <td>
+                    <div class="btn-list flex-nowrap">
+                        <a class="btn btn-sm" href="{% url 'department_update' department.id %}">Изменить</a>
+                        <a class="btn btn-sm btn-outline-danger" href="{% url 'department_delete' department.id %}">Удалить</a>
+                    </div>
+                </td>
+                {% endif %}
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="text-center text-secondary py-5">Факультетов пока нет.</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
